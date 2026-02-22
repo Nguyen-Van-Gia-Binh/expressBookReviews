@@ -1,0 +1,95 @@
+=== Q2: GET ALL BOOKS ===
+{
+  "1": {
+    "author": "Chinua Achebe",
+    "title": "Things Fall Apart",
+    "reviews": {}
+  },
+  "2": {
+    "author": "Hans Christian Andersen",
+    "title": "Fairy tales",
+    "reviews": {}
+  },
+  "3": {
+    "author": "Dante Alighieri",
+    "title": "The Divine Comedy",
+    "reviews": {}
+  },
+  "4": {
+    "author": "Unknown",
+    "title": "The Epic Of Gilgamesh",
+    "reviews": {}
+  },
+  "5": {
+    "author": "Unknown",
+    "title": "The Book Of Job",
+    "reviews": {}
+  },
+  "6": {
+    "author": "Unknown",
+    "title": "One Thousand and One Nights",
+    "reviews": {}
+  },
+  "7": {
+    "author": "Unknown",
+    "title": "Njl's Saga",
+    "reviews": {}
+  },
+  "8": {
+    "author": "Jane Austen",
+    "title": "Pride and Prejudice",
+    "reviews": {}
+  },
+  "9": {
+    "author": "Honor de Balzac",
+    "title": "Le Pre Goriot",
+    "reviews": {}
+  },
+  "10": {
+    "author": "Samuel Beckett",
+    "title": "Molloy, sMalone Dies, The Unnamable, the trilogy",
+    "reviews": {}
+  }
+}
+
+=== Q3: GET BOOK BY ISBN (isbn=1) ===
+{
+  "author": "Chinua Achebe",
+  "title": "Things Fall Apart",
+  "reviews": {}
+}
+
+=== Q4: GET BOOKS BY AUTHOR ===
+[
+  {
+    "author": "Jane Austen",
+    "title": "Pride and Prejudice",
+    "reviews": {}
+  }
+]
+
+=== Q5: GET BOOKS BY TITLE ===
+[
+  {
+    "author": "Hans Christian Andersen",
+    "title": "Fairy tales",
+    "reviews": {}
+  }
+]
+
+=== Q6: GET BOOK REVIEW (isbn=1) ===
+{}
+
+=== Q7: REGISTER ===
+User registered successfully
+
+=== Q8: LOGIN ===
+Response: Ok
+
+=== Q9: ADD REVIEW ===
+Response: Review added/updated successfully
+Reviews: {"testuser2":"This is a great book! Highly recommended."}
+
+=== Q10: DELETE REVIEW ===
+Response: Review deleted successfully
+Reviews after delete: {}
