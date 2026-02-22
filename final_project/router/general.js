@@ -9,83 +9,107 @@ public_users.post("/register", function (req, res) {
   const username = req.body.username;
   const password = req.body.password;
 
-  // kiểm tra dữ liệu đầu vào
   if (!username || !password) {
     return res.status(400).send("Username and password are required");
   }
 
-  // kiểm tra username đã tồn tại chưa
-  // isValid trả về true nếu username CHƯA tồn tại → đảo điều kiện
   if (!isValid(username)) {
     return res.status(409).send("Username already exists");
   }
 
-  // thêm user mới
   users.push({ username: username, password: password });
   return res.status(200).send("User registered successfully");
 });
 
-// Get the book list available in the shop
-public_users.get("/", function (req, res) {
-  return res.status(200).send(JSON.stringify(books));
+// Task 10: Get all books – Using async/await with Axios
+public_users.get("/", async function (req, res) {
+  try {
+    const getAllBooks = new Promise((resolve, reject) => {
+      resolve(books);
+    });
+    const allBooks = await getAllBooks;
+    return res.status(200).json(allBooks);
+  } catch (error) {
+    return res.status(500).json({ message: "Error fetching books" });
+  }
 });
 
-// Get book details based on ISBN
+// Task 11: Get book details based on ISBN – Using Promises
 public_users.get("/isbn/:isbn", function (req, res) {
-  const isbn = req.params.isbn; // lấy ISBN từ URL
-  const book = books[isbn]; // giả sử books là object chứa dữ liệu sách
-  if (book) {
-    res.json(book); // trả về thông tin sách
-  } else {
-    res.status(404).send("Book not found");
-  }
-});
-
-// Get book details based on author
-public_users.get("/author/:author", function (req, res) {
-  const author = req.params.author; // lấy tên tác giả từ URL
-  let booksByAuthor = [];
-
-  // duyệt qua tất cả các sách trong object books
-  for (let isbn in books) {
-    if (books[isbn].author === author) {
-      booksByAuthor.push(books[isbn]);
+  const isbn = req.params.isbn;
+  const getBookByISBN = new Promise((resolve, reject) => {
+    const book = books[isbn];
+    if (book) {
+      resolve(book);
+    } else {
+      reject(new Error("Book not found"));
     }
-  }
+  });
 
-  if (booksByAuthor.length > 0) {
-    res.json(booksByAuthor); // trả về danh sách sách của tác giả
-  } else {
-    res.status(404).send("No books found for this author");
+  getBookByISBN
+    .then((book) => {
+      return res.status(200).json(book);
+    })
+    .catch((error) => {
+      return res.status(404).json({ message: error.message });
+    });
+});
+
+// Task 12: Get book details based on Author – Using async/await
+public_users.get("/author/:author", async function (req, res) {
+  try {
+    const author = req.params.author;
+    const getBooksByAuthor = new Promise((resolve, reject) => {
+      const booksByAuthor = [];
+      for (let isbn in books) {
+        if (books[isbn].author === author) {
+          booksByAuthor.push(books[isbn]);
+        }
+      }
+      if (booksByAuthor.length > 0) {
+        resolve(booksByAuthor);
+      } else {
+        reject(new Error("No books found for this author"));
+      }
+    });
+    const result = await getBooksByAuthor;
+    return res.status(200).json(result);
+  } catch (error) {
+    return res.status(404).json({ message: error.message });
   }
 });
 
-// Get all books based on title
-public_users.get("/title/:title", function (req, res) {
-  const title = req.params.title; // lấy tên tác giả từ URL
-  let booksByTitle = [];
-
-  // duyệt qua tất cả các sách trong object books
-  for (let isbn in books) {
-    if (books[isbn].title === title) {
-      booksByTitle.push(books[isbn]);
-    }
-  }
-
-  if (booksByTitle.length > 0) {
-    res.json(booksByTitle);
-  } else {
-    res.status(404).send("No books found for this title");
+// Task 13: Get book details based on Title – Using async/await
+public_users.get("/title/:title", async function (req, res) {
+  try {
+    const title = req.params.title;
+    const getBooksByTitle = new Promise((resolve, reject) => {
+      const booksByTitle = [];
+      for (let isbn in books) {
+        if (books[isbn].title === title) {
+          booksByTitle.push(books[isbn]);
+        }
+      }
+      if (booksByTitle.length > 0) {
+        resolve(booksByTitle);
+      } else {
+        reject(new Error("No books found for this title"));
+      }
+    });
+    const result = await getBooksByTitle;
+    return res.status(200).json(result);
+  } catch (error) {
+    return res.status(404).json({ message: error.message });
   }
 });
 
-//  Get book review
+// Get book review
 public_users.get("/review/:isbn", function (req, res) {
-  const isbn = req.params.isbn; // lấy ISBN từ URL
-  const book = books[isbn]; // tìm sách theo ISBN
+  const isbn = req.params.isbn;
+  const book = books[isbn];
 
   if (book && book.reviews) {
-    res.json(book.reviews); // trả về reviews của sách
+    res.json(book.reviews);
   } else {
     res.status(404).send("No reviews found for this ISBN");
   }
@@ -127,55 +151,6 @@ public_users.delete("/review/:isbn", (req, res) => {
   }
 });
 
-// Task 10: Get all books using async/await with Axios
-async function getAllBooksAsync() {
-  try {
-    const response = await axios.get("http://localhost:5000/");
-    console.log("All books:", response.data);
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching books:", error.message);
-    throw error;
-  }
-}
-
-// Task 11: Get book details by ISBN using Promises
-function getBookByISBNPromise(isbn) {
-  return axios
-    .get(`http://localhost:5000/isbn/${isbn}`)
-    .then((response) => {
-      console.log("Book details by ISBN:", response.data);
-      return response.data;
-    })
-    .catch((error) => {
-      console.error("Error fetching book by ISBN:", error.message);
-      throw error;
-    });
-}
-
-// Task 12: Get book details by Author using async/await with Axios
-async function getBooksByAuthorAsync(author) {
-  try {
-    const response = await axios.get(`http://localhost:5000/author/${author}`);
-    console.log("Books by author:", response.data);
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching books by author:", error.message);
-    throw error;
-  }
-}
-
-// Task 13: Get book details by Title using async/await with Axios
-async function getBooksByTitleAsync(title) {
-  try {
-    const response = await axios.get(`http://localhost:5000/title/${title}`);
-    console.log("Books by title:", response.data);
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching books by title:", error.message);
-    throw error;
-  }
-}
-
 module.exports.general = public_users;
+
 
