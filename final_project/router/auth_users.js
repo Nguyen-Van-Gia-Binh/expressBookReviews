@@ -32,7 +32,7 @@ regd_users.post("/login", (req, res) => {
       token,
       username,
     };
-    res.send("Ok");
+    res.status(200).json({ message: "Login successful!" });
   } else {
     res.status(404).send("Invalid username or password");
   }

@@ -91,42 +91,91 @@ public_users.get("/review/:isbn", function (req, res) {
   }
 });
 
-async function getBooksPromise() {
+// Add a book review (authenticated)
+public_users.put("/review/:isbn", (req, res) => {
+  if (!req.session || !req.session.authenticated) {
+    return res.status(401).json({ message: "Please login first" });
+  }
+  const isbn = req.params.isbn;
+  if (!books[isbn]) {
+    return res.status(404).json({ message: "Book not found" });
+  }
+  const username = req.session.authenticated.username;
+  const review = req.body.review;
+  if (!review) {
+    return res.status(400).json({ message: "Review text is required" });
+  }
+  books[isbn].reviews[username] = review;
+  res.status(200).json({ message: "Review added/updated successfully", reviews: books[isbn].reviews });
+});
+
+// Delete a book review (authenticated)
+public_users.delete("/review/:isbn", (req, res) => {
+  if (!req.session || !req.session.authenticated) {
+    return res.status(401).json({ message: "Please login first" });
+  }
+  const isbn = req.params.isbn;
+  if (!books[isbn]) {
+    return res.status(404).json({ message: "Book not found" });
+  }
+  const username = req.session.authenticated.username;
+  if (books[isbn].reviews[username]) {
+    delete books[isbn].reviews[username];
+    res.status(200).json({ message: "Review deleted successfully" });
+  } else {
+    res.status(404).json({ message: "No review found for this user" });
+  }
+});
+
+// Task 10: Get all books using async/await with Axios
+async function getAllBooksAsync() {
   try {
-    const res = await axios.get("http://localhost:5000/");
-    console.log(res);
-  } catch (e) {
-    console.log("Error fetching books");
+    const response = await axios.get("http://localhost:5000/");
+    console.log("All books:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching books:", error.message);
+    throw error;
   }
 }
 
-function getBookDetailByTitle(title) {
-  axios
-    .get(`http://localhost:5000/title/${title}`)
-    .then((response) => {
-      console.log(response);
-    })
-    .catch((err) => console.log(err));
-}
-
-function getBookDetailByAuthor(author) {
-  axios
-    .get(`http://localhost:5000/author/${author}`)
-    .then((response) => {
-      console.log(response);
-    })
-    .catch((err) => console.log(err));
-}
-
+// Task 11: Get book details by ISBN using Promises
 function getBookByISBNPromise(isbn) {
-  axios
+  return axios
     .get(`http://localhost:5000/isbn/${isbn}`)
     .then((response) => {
-      console.log("Chi tiết sách:", response.data);
+      console.log("Book details by ISBN:", response.data);
+      return response.data;
     })
     .catch((error) => {
-      console.error("Lỗi khi lấy chi tiết sách:", error);
+      console.error("Error fetching book by ISBN:", error.message);
+      throw error;
     });
 }
 
+// Task 12: Get book details by Author using async/await with Axios
+async function getBooksByAuthorAsync(author) {
+  try {
+    const response = await axios.get(`http://localhost:5000/author/${author}`);
+    console.log("Books by author:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching books by author:", error.message);
+    throw error;
+  }
+}
+
+// Task 13: Get book details by Title using async/await with Axios
+async function getBooksByTitleAsync(title) {
+  try {
+    const response = await axios.get(`http://localhost:5000/title/${title}`);
+    console.log("Books by title:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching books by title:", error.message);
+    throw error;
+  }
+}
+
 module.exports.general = public_users;
+
